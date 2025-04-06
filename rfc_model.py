@@ -19,7 +19,7 @@ class RFC_Model:
 
     def preprocess_data(self):
         """
-        Preprocess and cleans the data, assign labels 1 for malicious and 0 for normal traffic
+        Preprocess and cleans the data, assign labels 1 for malicious and 0 for normal traffic, encode the protocol
         """
         self.df_torii["label"] = 1
         self.df_cc["label"] = 1
@@ -44,12 +44,12 @@ class RFC_Model:
             normal_df = normal_df.sample(n=rows_malicious)
         return pd.concat([malicious_df, normal_df], ignore_index=True)
 
-    def create_and_evaluate_model(self):
+    def create_and_evaluate_model(self) -> tuple[str, np.ndarray, float]:
         """
         Create and evaluate the model, returns the classification report, confusion matrix and roc auc score
         """
         y = self.df_all['label']
-        X = self.df_all.drop(columns=['label'])  
+        X = self.df_all.drop(columns=['label']) 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
         self.model = RandomForestClassifier(n_estimators=100, random_state=42)
         self.model.fit(X_train, y_train)
@@ -57,7 +57,7 @@ class RFC_Model:
         y_probs = self.model.predict_proba(X_test)[:, 1]
         return classification_report(y_test, y_pred), confusion_matrix(y_test, y_pred), roc_auc_score(y_test, y_probs)
 
-    def save_model(self):
+    def save_model(self) -> None:
         joblib.dump(self.model, "rfc_model.pkl")
 
 
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     print("Classification Report :\n", classification_report)
     print("Confusion Matrix :\n", confusion_matrix)
     print("ROC AUC Score :", roc_auc_score)
-    rfc_model.save_model() if roc_auc_score > 0.95 else print("Model is not good enough")
+    rfc_model.save_model() if roc_auc_score > 0.999 else print("Model is not good enough")
 
 
 
