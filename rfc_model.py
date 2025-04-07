@@ -58,6 +58,10 @@ class RFC_Model:
         return classification_report(y_test, y_pred), confusion_matrix(y_test, y_pred), roc_auc_score(y_test, y_probs)
 
     def save_model(self) -> None:
+        with open("Column_Names.txt", "w") as file:
+            for col in self.df_all.columns:
+                if col != "label":
+                    file.write(f"{col}\n")
         joblib.dump(self.model, "rfc_model.pkl")
 
 
@@ -71,12 +75,3 @@ if __name__ == "__main__":
     print("Confusion Matrix :\n", confusion_matrix)
     print("ROC AUC Score :", roc_auc_score)
     rfc_model.save_model() if roc_auc_score > 0.999 else print("Model is not good enough")
-
-
-
-
-
-
-
-
-
